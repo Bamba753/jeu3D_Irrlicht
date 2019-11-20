@@ -1,128 +1,310 @@
 #include <irrlicht.h>
 #include "driverChoice.h"
-#include "GameEvent.h"   //Gestion Interface
 
 using namespace irr;
 
-using namespace core;
-using namespace scene;
-using namespace video;
-using namespace io;
-using namespace gui;
-
-#ifdef _IRR_WINDOWS_
+#ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
 #endif
 
+enum
+{
+    // I use this ISceneNode ID to indicate a scene node that is
+    // not pickable by getSceneNodeAndCollisionPointFromRay()
+    ID_IsNotPickable = 0,
+
+    // I use this flag in ISceneNode IDs to indicate that the
+    // scene node can be picked by ray selection.
+    IDFlag_IsPickable = 1 << 0,
+
+    // I use this flag in ISceneNode IDs to indicate that the
+    // scene node can be highlighted.  In this example, the
+    // homonids can be highlighted, but the level mesh can't.
+    IDFlag_IsHighlightable = 1 << 1
+};
 
 int main()
 {
-    // driver OpenGl
-    video::E_DRIVER_TYPE driverType = video::EDT_OPENGL;
+    // ask user for driver
+    video::E_DRIVER_TYPE driverType=driverChoiceConsole();
     if (driverType==video::EDT_COUNT)
         return 1;
 
-    // create device and exit if creation failed
+    // create device
 
-    IrrlichtDevice * device = createDevice(driverType, core::dimension2d<u32>(640, 480));
+    IrrlichtDevice *device =
+        createDevice(driverType, core::dimension2d<u32>(640, 480), 16, false);
 
     if (device == 0)
         return 1; // could not create selected driver.
 
-    device->setWindowCaption(L"Irrlicht Engine - User Interface Demo");
-    device->setResizable(true);
-    device->getFileSystem()->addFileArchive("data/map-20kdm2.pk3");
-
     video::IVideoDriver* driver = device->getVideoDriver();
-    IGUIEnvironment* env = device->getGUIEnvironment();
     scene::ISceneManager* smgr = device->getSceneManager();
 
-    IGUISkin* skin = env->getSkin();
-    IGUIFont* font = env->getFont("data/fonthaettenschweiler.bmp");
-    if (font)
-        skin->setFont(font);
+    device->getFileSystem()->addFileArchive("data/crewctf.pk3");
 
-    skin->setFont(env->getBuiltInFont(), EGDF_TOOLTIP);
+    scene::IAnimatedMesh* q3levelmesh = smgr->getMesh("crewctf.bsp");
+    scene::IMeshSceneNode* q3node = 0;
 
-    env->addButton(rect<s32>(10,240,110,240 + 32), 0, GUI_ID_QUIT_BUTTON,
-            L"Quit", L"Exits Program");
-    env->addButton(rect<s32>(10,280,110,280 + 32), 0, GUI_ID_NEW_WINDOW_BUTTON,
-            L"Launch Game", L"Launches a new Window");
+    // The Quake mesh is pickable, but doesn't get highlighted.
+    if (q3levelmesh)
+        q3node = smgr->addOctreeSceneNode(q3levelmesh->getMesh(0), 0, IDFlag_IsPickable);
 
 
+    scene::ITriangleSelector* selector = 0;
 
-    /////////////////////////////////////////////////////////////////////////
-    /// Interface
-    ////////////////////////////////////////////////////////////////////////
-    // Store the appropriate data in a context structure.
-    SAppContext context;
-    SAppContext game;
-
-    context.device = device;
-    context.launch = false;
-
-    // Then create the event receiver, giving it that context structure.
-    GameEvent receiver(context);;
-
-    // And tell the device to use our custom event receiver.
-    device->setEventReceiver(&receiver);
+      if (q3node)
+      {
+          q3node->setPosition(core::vector3df(-100,0,200));
+//          q3node->setPosition(core::vector3df(298,0,208));
 
 
-    ///////////////////////////////////////////////////////////////////////////
-    /// Scene
-    //////////////////////////////////////////////////////////////////////////
-    scene::IAnimatedMesh* mesh = smgr->getMesh("20kdm2.bsp");
-    scene::ISceneNode* node = 0;
+          selector = smgr->createOctreeTriangleSelector(
+                  q3node->getMesh(), q3node, 128);
+          q3node->setTriangleSelector(selector);
+          // We're not done with this selector yet, so don't drop it.
+      }
 
-    if (mesh)
-        node = smgr->addOctreeSceneNode(mesh->getMesh(0), 0, -1, 1024);
+      // Set a jump speed of 3 units per second, which gives a fairly realistic jump
+      // when used with the gravity of (0, -10, 0) in the collision response animator.
 
-    if (node)
-        node->setPosition(core::vector3df(-1300,-144,-1249));
+      SKeyMap keyMap[9];
+              keyMap[0].Action = EKA_MOVE_FORWARD;
+              keyMap[0].KeyCode = KEY_UP;
+              keyMap[1].Action = EKA_MOVE_FORWARD;
+              keyMap[1].KeyCode = KEY_KEY_Z;
 
-    smgr->addCameraSceneNodeFPS();
-    device->getCursorControl()->setVisible(false);
-    int lastFPS = -1;
+              keyMap[2].Action = EKA_MOVE_BACKWARD;
+              keyMap[2].KeyCode = KEY_DOWN;
+              keyMap[3].Action = EKA_MOVE_BACKWARD;
+              keyMap[3].KeyCode = KEY_KEY_S;
 
-    while(device->run())
-     {
-        game = receiver.Context;
-        if (device->isWindowActive())
-        {
-            driver->beginScene(true, true, video::SColor(255,200,200,200));
-            ////////////////////////////////////////////////////////////////
-            /// Game
-            ////////////////////////////////////////////////////////////////
-            if(game.launch){
-                smgr->drawAll();
+              keyMap[4].Action = EKA_STRAFE_LEFT;
+              keyMap[4].KeyCode = KEY_LEFT;
+              keyMap[5].Action = EKA_STRAFE_LEFT;
+              keyMap[5].KeyCode = KEY_KEY_A;
 
-                int fps = driver->getFPS();
+              keyMap[6].Action = EKA_STRAFE_RIGHT;
+              keyMap[6].KeyCode = KEY_RIGHT;
+              keyMap[7].Action = EKA_STRAFE_RIGHT;
+              keyMap[7].KeyCode = KEY_KEY_D;
 
-                if (lastFPS != fps)
-                {
-                    core::stringw str = L"Irrlicht Engine - Quake 3 Map example [";
-                    str += driver->getName();
-                    str += "] FPS:";
-                    str += fps;
+              keyMap[8].Action = EKA_JUMP_UP;
+              keyMap[8].KeyCode = KEY_SPACE;
 
-                    device->setWindowCaption(str.c_str());
-                    lastFPS = fps;
-                }
-            }
-            else
-            {
-                env->drawAll();
-            }
 
-            driver->endScene();
 
-        }
-        else
-           device->yield();
-        }
+      scene::ICameraSceneNode* camera =
+          smgr->addCameraSceneNodeFPS(0, 100.0f, .3f, ID_IsNotPickable, keyMap, 9, true, 10.f);
+      camera->setPosition(core::vector3df(50,50,-60));
+      camera->setTarget(core::vector3df(-70,30,-60));
 
-    device->drop();
+      if (selector)
+      {
 
-    return 0;
-}
+                 core::vector3df radius =core::vector3df(30,40,30);
 
+                 /*TEST Set gravity scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(
+                 selector, camera,radius ,
+                 core::vector3df(0,-10,0), core::vector3df(0,50,0));*/
+
+          scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(
+              selector, camera,radius ,
+              core::vector3df(0,-10,0), core::vector3df(0,50,0));
+          selector->drop(); // As soon as we're done with the selector, drop it.
+          camera->addAnimator(anim);
+          anim->drop();  // And likewise, drop the animator when we're done referring to it.
+      }
+
+      // Now I create three animated characters which we can pick, a dynamic light for
+      // lighting them, and a billboard for drawing where we found an intersection.
+
+      // First, let's get rid of the mouse cursor.  We'll use a billboard to show
+      // what we're looking at.
+      device->getCursorControl()->setVisible(false);
+
+      // Add the billboard.
+      scene::IBillboardSceneNode * bill = smgr->addBillboardSceneNode();
+      bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR );
+      bill->setMaterialTexture(0, driver->getTexture("media/particle.bmp"));
+      bill->setMaterialFlag(video::EMF_LIGHTING, false);
+      bill->setMaterialFlag(video::EMF_ZBUFFER, false);
+      bill->setSize(core::dimension2d<f32>(20.0f, 20.0f));
+      bill->setID(ID_IsNotPickable); // This ensures that we don't accidentally ray-pick it
+
+      scene::IAnimatedMeshSceneNode* node = 0;
+
+      video::SMaterial material;
+
+      // Add an MD2 node, which uses vertex-based animation.
+      /*node = smgr->addAnimatedMeshSceneNode(smgr->getMesh("media/faerie.md2"),
+                          0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+      node->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
+      node->setScale(core::vector3df(1.6f)); // Make it appear realistically scaled
+      node->setMD2Animation(scene::EMAT_POINT);
+      node->setAnimationSpeed(20.f);
+      material.setTexture(0, driver->getTexture("media/faerie2.bmp"));
+      material.Lighting = true;
+      material.NormalizeNormals = true;
+      node->getMaterial(0) = material;*/
+
+
+      // Add an MD2 node, which uses vertex-based animation.
+      node = smgr->addAnimatedMeshSceneNode(smgr->getMesh("data/Archvile/Archvile.md2"),
+                          0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+      node->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
+      node->setScale(core::vector3df(1.6f)); // Make it appear realistically scaled
+      node->setMD2Animation(scene::EMAT_STAND);
+      node->setAnimationSpeed(20.f);
+      material.setTexture(0, driver->getTexture("data/Archvile/archvile.png"));
+      material.Lighting = true;
+      material.NormalizeNormals = true;
+      node->getMaterial(0) = material;
+
+      // Now create a triangle selector for it.  The selector will know that it
+      // is associated with an animated node, and will update itself as necessary.
+      selector = smgr->createTriangleSelector(node);
+      node->setTriangleSelector(selector);
+      selector->drop(); // We're done with this selector, so drop it now.
+
+      // And this B3D file uses skinned skeletal animation.
+      node = smgr->addAnimatedMeshSceneNode(smgr->getMesh("media/ninja.b3d"),
+                          0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+      node->setScale(core::vector3df(10));
+      node->setPosition(core::vector3df(-75,-66,-80));
+      node->setRotation(core::vector3df(0,90,0));
+      node->setAnimationSpeed(8.f);
+      node->getMaterial(0).NormalizeNormals = true;
+      node->getMaterial(0).Lighting = true;
+      // Just do the same as we did above.
+      selector = smgr->createTriangleSelector(node);
+      node->setTriangleSelector(selector);
+      selector->drop();
+
+      // This X files uses skeletal animation, but without skinning.
+      node = smgr->addAnimatedMeshSceneNode(smgr->getMesh("media/dwarf.x"),
+                          0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+      node->setPosition(core::vector3df(-70,-66,-30)); // Put its feet on the floor.
+      node->setRotation(core::vector3df(0,-90,0)); // And turn it towards the camera.
+      node->setAnimationSpeed(20.f);
+      node->getMaterial(0).Lighting = true;
+      selector = smgr->createTriangleSelector(node);
+      node->setTriangleSelector(selector);
+      selector->drop();
+
+
+      // And this mdl file uses skinned skeletal animation.
+      node = smgr->addAnimatedMeshSceneNode(smgr->getMesh("media/yodan.mdl"),
+                          0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+      node->setPosition(core::vector3df(-90,-25,20));
+      node->setScale(core::vector3df(0.8f));
+      node->getMaterial(0).Lighting = true;
+      node->setAnimationSpeed(20.f);
+
+      // Just do the same as we did above.
+      selector = smgr->createTriangleSelector(node);
+      node->setTriangleSelector(selector);
+      selector->drop();
+
+      material.setTexture(0, 0);
+      material.Lighting = false;
+
+      // Add a light, so that the unselected nodes aren't completely dark.
+      scene::ILightSceneNode * light = smgr->addLightSceneNode(0, core::vector3df(-60,100,400),
+          video::SColorf(1.0f,1.0f,1.0f,1.0f), 600.0f);
+      light->setID(ID_IsNotPickable); // Make it an invalid target for selection.
+
+      // Remember which scene node is highlighted
+      scene::ISceneNode* highlightedSceneNode = 0;
+      scene::ISceneCollisionManager* collMan = smgr->getSceneCollisionManager();
+      int lastFPS = -1;
+
+      // draw the selection triangle only as wireframe
+      material.Wireframe=true;
+
+      while(device->run())
+      if (device->isWindowActive())
+      {
+          driver->beginScene(true, true, 0);
+          smgr->drawAll();
+
+          // Unlight any currently highlighted scene node
+          if (highlightedSceneNode)
+          {
+              highlightedSceneNode->setMaterialFlag(video::EMF_LIGHTING, true);
+              highlightedSceneNode = 0;
+          }
+
+          // All intersections in this example are done with a ray cast out from the camera to
+          // a distance of 1000.  You can easily modify this to check (e.g.) a bullet
+          // trajectory or a sword's position, or create a ray from a mouse click position using
+          // ISceneCollisionManager::getRayFromScreenCoordinates()
+          core::line3d<f32> ray;
+          ray.start = camera->getPosition();
+          ray.end = ray.start + (camera->getTarget() - ray.start).normalize() * 10000.0f;
+         // std::cout<<camera->getPosition().X<<","<<camera->getPosition().Y<<","<<camera->getPosition().Z<<std::endl;
+
+          // Tracks the current intersection point with the level or a mesh
+          core::vector3df intersection;
+          // Used to show with triangle has been hit
+          core::triangle3df hitTriangle;
+
+          // This call is all you need to perform ray/triangle collision on every scene node
+          // that has a triangle selector, including the Quake level mesh.  It finds the nearest
+          // collision point/triangle, and returns the scene node containing that point.
+          // Irrlicht provides other types of selection, including ray/triangle selector,
+          // ray/box and ellipse/triangle selector, plus associated helpers.
+          // See the methods of ISceneCollisionManager
+          scene::ISceneNode * selectedSceneNode =
+              collMan->getSceneNodeAndCollisionPointFromRay(
+                      ray,
+                      intersection, // This will be the position of the collision
+                      hitTriangle, // This will be the triangle hit in the collision
+                      IDFlag_IsPickable, // This ensures that only nodes that we have
+                              // set up to be pickable are considered
+                      0); // Check the entire scene (this is actually the implicit default)
+
+          // If the ray hit anything, move the billboard to the collision position
+          // and draw the triangle that was hit.
+          if(selectedSceneNode)
+          {
+              bill->setPosition(intersection);
+
+              // We need to reset the transform before doing our own rendering.
+              driver->setTransform(video::ETS_WORLD, core::matrix4());
+              driver->setMaterial(material);
+              //driver->draw3DTriangle(hitTriangle, video::SColor(0,255,0,0));
+
+              // We can check the flags for the scene node that was hit to see if it should be
+              // highlighted. The animated nodes can be highlighted, but not the Quake level mesh
+              if((selectedSceneNode->getID() & IDFlag_IsHighlightable) == IDFlag_IsHighlightable)
+              {
+                  highlightedSceneNode = selectedSceneNode;
+
+                  // Highlighting in this case means turning lighting OFF for this node,
+                  // which means that it will be drawn with full brightness.
+                  highlightedSceneNode->setMaterialFlag(video::EMF_LIGHTING, false);
+              }
+          }
+
+          // We're all done drawing, so end the scene.
+          driver->endScene();
+
+          int fps = driver->getFPS();
+
+          if (lastFPS != fps)
+          {
+              core::stringw str = L"Collision detection example - Irrlicht Engine [";
+              str += driver->getName();
+              str += "] FPS:";
+              str += fps;
+
+              device->setWindowCaption(str.c_str());
+              lastFPS = fps;
+          }
+      }
+
+      device->drop();
+
+      return 0;
+  }
