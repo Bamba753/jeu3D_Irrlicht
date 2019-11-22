@@ -1,6 +1,7 @@
 #include "GameEvent.h"
 
 
+
 bool GameEvent::OnEvent(const irr::SEvent& event)
 {
     if (event.EventType == EET_GUI_EVENT)
