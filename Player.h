@@ -13,14 +13,17 @@ class Player
     public:
             Player(ISceneManager* mysmgr, IVideoDriver* mydriver, Camera* mycamera,SMaterial mymaterial);
             IAnimatedMeshSceneNode* getNode();
+            void setNode(IAnimatedMeshSceneNode* value);
             IBillboardSceneNode* getBill();
             vector3df getPosition();
-            void updatePosition(Camera* camera);
-            void targetGun();
+            aabbox3d<f32> getBox();
+            void updateBox();
+            scene::ISceneNode* targetGun();
             int getHealth();
             void shoot();
             void isDead();
             void healthDecrease();
+            void setHighLight(scene::ISceneNode* value);
 
 
     private:
@@ -31,7 +34,6 @@ class Player
             IAnimatedMesh* mesh;
             IAnimatedMeshSceneNode* node;
             int health;
-            core::vector3df dist_cameraplayer = core::vector3df(0.0,-20.0,10.0);
             scene::IBillboardSceneNode * bill;
             scene::ILightSceneNode * light;
             scene::ISceneNode* highlightedSceneNode;

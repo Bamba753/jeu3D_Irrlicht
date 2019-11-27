@@ -1,25 +1,20 @@
-#include "stdafx.h"
 #include "Player.h"
 
 
 Player::Player(ISceneManager* mysmgr, IVideoDriver* mydriver, Camera* mycamera,SMaterial mymaterial):smgr(mysmgr),driver(mydriver),camera(mycamera),material(mymaterial)
 {
-	mesh = smgr->getMesh("data/AK/AK.obj");//data/AK_47/Adding/AK.obj");
-    node = smgr->addAnimatedMeshSceneNode(mesh, smgr->getActiveCamera(), 10, core::vector3df(35, -35, 75));
-	node->setMaterialTexture(0, driver->getTexture("data/AK/Textures/AK_diffuse.jpg"));//AK_47/T2.bmp"));
-	/*node->setMaterialTexture(1, driver->getTexture("data/AK/Textures/AK_normal.jpg"));//AK_47/T2.bmp"));
-	node->setMaterialTexture(2, driver->getTexture("data/AK/Textures/AK_specular.jpg"));//AK_47/T2.bmp"));
-	*/
-	
-	node->setMaterialFlag(EMF_LIGHTING, false);
+    mesh = smgr->getMesh("data/AK/AK.obj");
+    node = smgr->addAnimatedMeshSceneNode(mesh, smgr->getActiveCamera(),
+                                          10,
+                                          core::vector3df (35, -35, 75));
+    node->setMaterialTexture(0, driver->getTexture("data/AK/AK_diffuse.jpg"));
+    node->setMaterialFlag(EMF_LIGHTING, false);
     node->setScale(core::vector3df(0.4f));
-	node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
-	node->setMaterialFlag(video::EMF_ZBUFFER, false);
-
-
-    //node->setPosition(camera->getNode()->getAbsolutePosition()+dist_cameraplayer);
-   // node->setRotation(camera->getNode()->getRotation());
+    node->setDebugDataVisible(irr::scene::EDS_BBOX);
+    node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
+    node->setMaterialFlag(video::EMF_ZBUFFER, false);
     health = 10;
+
 
     // Viseur.
     bill = smgr->addBillboardSceneNode();
@@ -56,19 +51,16 @@ IBillboardSceneNode * Player::getBill(){
     return bill;
 }
 
-void Player::updatePosition(Camera* camera)
-{
-    //std::cout<<camera->getNode()->getPosition().X<<" "<<camera->getNode()->getPosition().Y<<" "<<camera->getNode()->getPosition().Z<<std::endl;
-    node->setPosition(camera->getNode()->getAbsolutePosition()+dist_cameraplayer);
-    node->setRotation(camera->getNode()->getRotation());
-
-}
-
 IAnimatedMeshSceneNode* Player::getNode()
 {
     return node;
 }
 
+void Player::setNode(IAnimatedMeshSceneNode* value)
+{
+
+    node = value;
+}
 
 void Player::shoot()
 {
@@ -76,14 +68,25 @@ void Player::shoot()
 
 }
 
+/*aabbox3d<f32> Player::getBox()
+{
+    return box;
+}*/
+
 void Player::isDead()
 {
 
 }
 
-void Player::targetGun()
+void Player::setHighLight(scene::ISceneNode* value)
 {
-    if (highlightedSceneNode)
+    highlightedSceneNode=value;
+}
+
+scene::ISceneNode* Player::targetGun()
+{
+
+       if( highlightedSceneNode )
     {
         highlightedSceneNode->setMaterialFlag(video::EMF_LIGHTING, true);
         highlightedSceneNode = 0;
@@ -116,20 +119,24 @@ void Player::targetGun()
         bill->setPosition(intersection);
 
         // We need to reset the transform before doing our own rendering.
-        driver->setTransform(video::ETS_WORLD, core::matrix4());
-        driver->setMaterial(material);
+        /*driver->setTransform(video::ETS_WORLD, core::matrix4());
+        driver->setMaterial(material);*/
 
         // We can check the flags for the scene node that was hit to see if it should be
         // highlighted. The animated nodes can be highlighted, but not the Quake level mesh
         if((selectedSceneNode->getID() & IDFlag_IsHighlightable) == IDFlag_IsHighlightable)
         {
             highlightedSceneNode = selectedSceneNode;
-
             // Highlighting in this case means turning lighting OFF for this node,
             // which means that it will be drawn with full brightness.
             highlightedSceneNode->setMaterialFlag(video::EMF_LIGHTING, false);
+
         }
+
     }
+
+    return(highlightedSceneNode);
+
 }
 
 

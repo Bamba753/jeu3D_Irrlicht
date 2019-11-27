@@ -1,5 +1,4 @@
-#include "stdafx.h"
-#include "irrlicht.h"
+#include <irrlicht.h>
 #include "driverChoice.h"
 
 using namespace irr;
@@ -18,6 +17,10 @@ struct SAppContext
 
 };
 
+
+
+
+
 enum
 {
     GUI_ID_QUIT_BUTTON = 101,
@@ -25,7 +28,8 @@ enum
     GUI_ID_CONTROLS_BUTTON,
     GUI_ID_INSTRUCTIONS_BUTTON,
     GUI_ID_INSTRUCTIONS_BACK_BUTTON,
-    GUI_ID_CONTROLS_BACK_BUTTON
+    GUI_ID_CONTROLS_BACK_BUTTON,
+    GUI_ID_PLAY_CONTINUE_BUTTON
 };
 
 
@@ -34,14 +38,22 @@ class GameEvent : public irr::IEventReceiver
     public:
 
         GameEvent(SAppContext& context);
-
+			
         virtual bool OnEvent(const irr::SEvent& event);
+			virtual bool getLeftButton(void) const;
         virtual bool isKeyDown(EKEY_CODE keyCode) const;
-        virtual bool isKeyUp(EKEY_CODE keyCode) const;
-
+        virtual bool isKeyUp(EKEY_CODE keyCode) const;			
+			//virtual const SMouseState& GetMouseState() const;
         SAppContext& Context;
+		
     private :
         bool keyDown[KEY_KEY_CODES_COUNT];
+
+      bool LeftButtonDown= false;
+		bool RightButtonDown=false;
+      
+
+
 };
 
 

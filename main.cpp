@@ -1,5 +1,4 @@
-#include "stdafx.h"
-#include "irrlicht.h"
+#include <irrlicht.h>
 #include "driverChoice.h"
 #include "Game.h"
 
@@ -19,7 +18,7 @@ int main()
 {
     // driver OpenGl
     video::E_DRIVER_TYPE driverType = video::EDT_OPENGL;
-    if (driverType == video::EDT_COUNT)
+    if (driverType==video::EDT_COUNT)
         return 1;
 
     // create device and exit if creation failed
@@ -29,7 +28,7 @@ int main()
         return 1; // could not create selected driver.
 
     device->setWindowCaption(L"Survive ");
-    device->setResizable(true);
+  //  device->setResizable(true);
     device->getFileSystem()->addFileArchive("data/egy2.pk3");
 
     video::IVideoDriver* driver = device->getVideoDriver();
@@ -43,8 +42,9 @@ int main()
     // Store the appropriate data in a context structure.
     SAppContext context;
     context.device = device;
+
     // Then create the event receiver, giving it that context structure.
-    GameEvent* receiver = new GameEvent(context);
+    GameEvent* receiver = new GameEvent(context);;
 
     // And tell the device to use our custom event receiver.
     device->setEventReceiver(receiver);
@@ -62,10 +62,10 @@ int main()
         //node = smgr->addOctreeSceneNode(mesh->getMesh(0), 0, -1, 1024);
         node = smgr->addOctreeSceneNode(mesh->getMesh(0));
 
-    if (node) {
-        node->setPosition(core::vector3df(100, -15.0, 250));
-        selector = smgr->createOctreeTriangleSelector(node->getMesh(), node, 128);
-        node->setTriangleSelector(selector);
+    if (node){
+            node->setPosition(core::vector3df(100,-15.0,250));
+            selector = smgr->createOctreeTriangleSelector(node->getMesh(), node, 128);
+            node->setTriangleSelector(selector);
     }
 
 
@@ -74,16 +74,18 @@ int main()
     //////////////////////////////////////////////////////////////////////////
 
     Camera* camera = new Camera(smgr);
-    camera->collision(smgr, selector);
+    camera->collision(smgr,selector);
 
     ///////////////////////////////////////////////////////////////////////////
     /// Initialisation
     //////////////////////////////////////////////////////////////////////////
 
-    Game* game = new Game(device, smgr, driver, material, selector, camera);
+    Game* game = new Game(device,smgr,driver,material,selector,camera);
     game->initInterface();
-    Player* player = new Player(smgr, driver, camera, material);
+    Player* player = new Player(smgr,driver,camera,material);
 
+    //Enemy* nodeEnemy = new Enemy(core::vector3df(0.231,0.0,207.0),0.3,smgr,camera,material,driver);
+    //nodeEnemy->collision(smgr,selector);
     game->loadEnemy();
     device->getCursorControl()->setVisible(true);
 
@@ -91,7 +93,7 @@ int main()
     material.Lighting = false;
 
     int lastFPS = -1;
-    material.Wireframe = true;
+    material.Wireframe=true;
 
     f32 deltaTime = 0.0f;
     f32 presentTime = 0.0f;
@@ -99,7 +101,7 @@ int main()
     f32 lastTime = 0.0f;
     bool begin = true;
 
-    while (device->run())
+    while(device->run())
     {
         if (!device->isWindowActive())
         {
@@ -110,38 +112,51 @@ int main()
         presentTime = device->getTimer()->getTime();
         deltaTime = presentTime - previousTime;
 
-        if ((deltaTime > 15) && (device->isWindowActive()))
+        if((deltaTime > 15) && (device->isWindowActive()))
         {
             driver->beginScene(true, true, 0);
 
             // pause or unpause the game
-            if (!begin && (presentTime - lastTime > 100)) {
-                game->pause(receiver->isKeyDown(KEY_SPACE), receiver);
-                game->unpause(receiver->isKeyDown(KEY_KEY_B), receiver, player);
+            if(!begin && (presentTime - lastTime > 100)){
+                game->pause(receiver->isKeyDown(KEY_SPACE) ,receiver);
+                game->unpause(receiver->isKeyDown(KEY_KEY_B) ,receiver,player);
                 lastTime = presentTime;
             }
 
-            if ((deltaTime > 15) && (receiver->Context.pause))
+            if((deltaTime > 15) && (receiver->Context.pause))
             {
                 device->getCursorControl()->setVisible(true);
                 game->displayPauseMenu();
             }
 
-            if ((deltaTime > 15) && (!receiver->Context.pause))
+            if((deltaTime > 15) && (!receiver->Context.pause))
             {
                 previousTime = presentTime;
-                if (receiver->Context.launch)
+                if(receiver->Context.launch)
                 {
                     device->getCursorControl()->setVisible(false);
-                    begin = false;
+                    begin =  false;
                     smgr->drawAll();
-                    player->targetGun();
+                    /*scene::ISceneNode* highlightedSceneNode=player->targetGun();
+                    if (highlightedSceneNode->getID()!=-1);*/
+                    game->killEnemy(player,receiver);
 
                     //player->updatePosition(camera);
                     game->displayHealthBar(player);
                     game->displayTime();
+                    game->runEnemy();
+                    game->collisionEntreEnemy();
+
+
                     //game
                     //nodeEnemy->attack();
+
+                    //game->collisionPlayerEnemy(camera,player,nodeEnemy);
+
+
+
+                   // if (receiver.GetMouseState())
+
 
                     int fps = driver->getFPS();
 

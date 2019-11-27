@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "GameEvent.h"
 
 GameEvent::GameEvent(SAppContext & context) : Context(context)
@@ -8,6 +7,17 @@ GameEvent::GameEvent(SAppContext & context) : Context(context)
                 keyDown[i] = false;
         }
 }
+
+
+
+
+
+
+/*const SMouseState & GameEvent::GetMouseState(void) const
+  {
+      return MouseState;
+  }
+*/
 
 
 bool GameEvent::OnEvent(const irr::SEvent& event)
@@ -74,6 +84,10 @@ bool GameEvent::OnEvent(const irr::SEvent& event)
                         env->addButton(rect<s32>(345, 400, 590, 440), 0, GUI_ID_QUIT_BUTTON,
                                 L"Quiter le jeu", L"Ah noooon. Tu veux quitter le jeu?");
                         break;
+                    case GUI_ID_PLAY_CONTINUE_BUTTON:
+                        env->clear();
+                        Context.launch = true;
+                        Context.pause = false;
 
                     default:
                         return false;
@@ -87,7 +101,37 @@ bool GameEvent::OnEvent(const irr::SEvent& event)
             break;
 
     }
+
+
+    if (event.EventType == irr::EET_MOUSE_INPUT_EVENT)
+    {
+        switch(event.MouseInput.Event)
+        {
+        case EMIE_LMOUSE_PRESSED_DOWN:
+            LeftButtonDown = true;
+            break;
+
+        case EMIE_LMOUSE_LEFT_UP:
+            LeftButtonDown = false;
+            break;
+
+      /* case EMIE_MOUSE_MOVED:
+            MouseState.Position.X = event.MouseInput.X;
+            MouseState.Position.Y = event.MouseInput.Y;
+            break;*/
+
+        default:
+            // We won't use the wheel
+            break;
+        }
+    }
+
     return false;
+}
+
+bool GameEvent::getLeftButton(void) const
+{
+    return LeftButtonDown;
 }
 
 bool GameEvent::isKeyDown(EKEY_CODE keyCode) const
@@ -99,4 +143,5 @@ bool GameEvent::isKeyUp(EKEY_CODE keyCode) const
 {
         return keyDown[keyCode];
 }
+
 

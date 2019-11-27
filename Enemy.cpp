@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Enemy.h"
 
 Enemy::Enemy(vector3df newPosition,float newSpeed,ISceneManager* smgr,Camera* playerTarget ,video::SMaterial material,IVideoDriver* driver)
@@ -13,7 +12,6 @@ Enemy::Enemy(vector3df newPosition,float newSpeed,ISceneManager* smgr,Camera* pl
     material.setTexture(0, driver->getTexture("data/Archvile/archvile.png"));
     material.Lighting = true;
     material.NormalizeNormals = true;
-
     node->getMaterial(0) = material;
 
     node->setDebugDataVisible(irr::scene::EDS_BBOX);
@@ -99,7 +97,7 @@ void Enemy::attack()
 void Enemy::collision(ISceneManager* smgr, ITriangleSelector* selector) {
 
     const core::aabbox3d<f32>& box = node->getBoundingBox();
-    core::vector3df radius = box.MaxEdge - box.getCenter()+core::vector3df(0,-15.0,0);
+    core::vector3df radius = box.MaxEdge - box.getCenter() + core::vector3df(0,-15.0,0);
 
     scene::ISceneNodeAnimator* anim =  smgr->createCollisionResponseAnimator(
                 selector, node,radius,
