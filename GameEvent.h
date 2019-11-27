@@ -1,40 +1,47 @@
-#include <irrlicht.h>
+#include "stdafx.h"
+#include "irrlicht.h"
 #include "driverChoice.h"
 
-// Declare a structure to hold some context for the event receiver so that it
-// has it available inside its OnEvent() method.
-#ifdef _IRR_WINDOWS_
-#pragma comment(lib, "Irrlicht.lib")
-#endif
 using namespace irr;
-
 using namespace core;
 using namespace scene;
 using namespace video;
 using namespace io;
 using namespace gui;
 
+
 struct SAppContext
 {
-    IrrlichtDevice *device;
-    bool            launch;
+    irr::IrrlichtDevice *device;
+    bool            launch ;
+    bool            pause ;
+
 };
 
 enum
 {
     GUI_ID_QUIT_BUTTON = 101,
-    GUI_ID_NEW_WINDOW_BUTTON,
+    GUI_ID_PLAY_BUTTON,
+    GUI_ID_CONTROLS_BUTTON,
+    GUI_ID_INSTRUCTIONS_BUTTON,
+    GUI_ID_INSTRUCTIONS_BACK_BUTTON,
+    GUI_ID_CONTROLS_BACK_BUTTON
 };
+
 
 class GameEvent : public irr::IEventReceiver
 {
     public:
 
-        GameEvent(SAppContext& context) : Context(context){};
+        GameEvent(SAppContext& context);
 
         virtual bool OnEvent(const irr::SEvent& event);
+        virtual bool isKeyDown(EKEY_CODE keyCode) const;
+        virtual bool isKeyUp(EKEY_CODE keyCode) const;
 
         SAppContext& Context;
+    private :
+        bool keyDown[KEY_KEY_CODES_COUNT];
 };
 
 
