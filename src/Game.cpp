@@ -285,7 +285,7 @@ void Game::killEnemy(Player* player,GameEvent* receiver)
 
     if ((player->targetGun() && player->targetGun()->getID()!=-1))
     {
-        if (receiver->getLeftButton() && ((device->getTimer()->getTime() - last) >600))
+        if (receiver->getLeftButton() && ((device->getTimer()->getTime() - last) >200))
         {
             scene::ISceneNode* ptr = NULL;
             Enemy* ptr_bis = NULL;

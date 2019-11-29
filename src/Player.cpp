@@ -75,6 +75,17 @@ bool Player::isDead()
     return false;
 }
 
+
+void Player::setRecul(bool recul)
+{
+    if (!recul)
+         node->setPosition(node->getPosition()+core::vector3df(0,0,-25));
+    else
+         node->setPosition(node->getPosition()+core::vector3df(0,0,25));
+
+
+}
+
 void Player::setHighLight(scene::ISceneNode* value)
 {
     highlightedSceneNode=value;

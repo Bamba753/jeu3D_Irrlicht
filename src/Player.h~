@@ -24,7 +24,6 @@ class Player
             void healthDecrease(IrrlichtDevice* device);
             void setHighLight(scene::ISceneNode* value);
             void setHealth(int value);
-				void setRecul(bool recul);
 
 
     private:

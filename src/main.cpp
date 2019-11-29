@@ -173,16 +173,15 @@ int main()
                     if(receiver->getLeftButton() && (device->getTimer()->getTime() - lastShoot > 200))
                     {
                         engine->play2D(shootSound); // Music background
-
-                        player->getNode()->setPosition(player->getNode()->getPosition()+core::vector3df(0,0,-25));
-                        recul=true;
+                        player->setRecul(recul);
+                       recul=true;
 
                         lastShoot = device->getTimer()->getTime();
                     }
                     if (recul && (device->getTimer()->getTime() - lastShoot > 50))
                     {
 
-                        player->getNode()->setPosition(player->getNode()->getPosition()+core::vector3df(0,0,25));
+                        player->setRecul(recul);
                         recul=false;
 
                     }
