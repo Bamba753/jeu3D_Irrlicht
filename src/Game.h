@@ -53,4 +53,7 @@ class Game
         f32 last = 0.0f;
         bool load_done;
         int wave;
+        Enemy* enemy_hurt;
+        bool enemy_dammage=false;
+        f32 last2 = 0.0f;
 };

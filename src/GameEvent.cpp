@@ -23,6 +23,7 @@ bool GameEvent::OnEvent(const irr::SEvent& event)
         {
             s32 id = event.GUIEvent.Caller->getID();
             IGUIEnvironment* env = Context.device->getGUIEnvironment();
+            LeftButtonDown = false;
 
             switch(event.GUIEvent.EventType)
             {
@@ -77,7 +78,6 @@ bool GameEvent::OnEvent(const irr::SEvent& event)
                         env->clear();
                         Context.launch = true;
                         Context.pause = false;
-                        break;
 
                     default:
                         return false;

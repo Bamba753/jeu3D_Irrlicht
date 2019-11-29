@@ -100,7 +100,7 @@ int main()
     u32 width;
     u32 heigth;
     bool begin = true;
-
+    bool pause = false;
 
     while(device->run())
     {
@@ -123,9 +123,21 @@ int main()
             heigth = sizeWindow.Height;
 
             // pause or unpause the game
-            if(!begin && (presentTime - lastTime > 100)){
-                game->pause(receiver->isKeyDown(KEY_SPACE) ,receiver);
-                game->unpause(receiver->isKeyDown(KEY_KEY_B) ,receiver,player);
+            if(!begin && (presentTime - lastTime > 300) &&receiver->isKeyDown(KEY_ESCAPE))
+            {
+                if (!pause)
+                {
+                    std::cout<<"pause"<<std::endl;
+                    game->pause(receiver->isKeyDown(KEY_ESCAPE) ,receiver);
+                    pause = true;
+                }
+                else
+                {
+                    std::cout<<"Unpause"<<std::endl;
+
+                    game->unpause(receiver->isKeyDown(KEY_ESCAPE) ,receiver,player);
+                    pause = false;
+                }
                 lastTime = presentTime;
             }
 

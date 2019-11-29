@@ -271,9 +271,21 @@ void Game::displayTime()
 void Game::killEnemy(Player* player,GameEvent* receiver)
 
 {
+
+    if (enemy_dammage && device->getTimer()->getTime()-last2>200.0f)
+    {
+        enemy_hurt->enemyHurt();
+        enemy_dammage=false;
+        last2=device->getTimer()->getTime();
+        enemy_hurt=NULL;
+
+
+
+    }
+
     if ((player->targetGun() && player->targetGun()->getID()!=-1))
     {
-        if (receiver->getLeftButton() && ((device->getTimer()->getTime() - last) >200))
+        if (receiver->getLeftButton() && ((device->getTimer()->getTime() - last) >600))
         {
             scene::ISceneNode* ptr = NULL;
             Enemy* ptr_bis = NULL;
@@ -299,9 +311,13 @@ void Game::killEnemy(Player* player,GameEvent* receiver)
                             {
 
                                 Enemy* enemy = dynamic_cast<Enemy*>(ptr_bis);
+                                enemy_hurt=dynamic_cast<Enemy*>(ptr_bis);
                                 enemy->healthDecrease();
+                                enemy_dammage=true;
+                                last2=device->getTimer()->getTime();
                                 if(enemy->getHealth() <= 0 )
                                 {
+                                    enemy_dammage=false;
                                     player->targetGun()->remove();
                                     player->setHighLight(NULL);
                                     enemyList.erase(it);

@@ -1,8 +1,9 @@
 #include "Enemy.h"
 
-Enemy::Enemy(vector3df newPosition,float newSpeed,int myhealth,bool transparent,ISceneManager* smgr,Camera* playerTarget ,video::SMaterial material,IVideoDriver* driver)
+Enemy::Enemy(vector3df newPosition,float newSpeed,int myhealth,bool transparent,ISceneManager* smgr,Camera* playerTarget ,video::SMaterial material,IVideoDriver* videodriver)
 {
     // Add an MD2 node, which uses vertex-based animation.
+    driver = videodriver;
     node = smgr->addAnimatedMeshSceneNode(smgr->getMesh("data/Archvile/Archvile.md2"),
                         0, IDFlag_IsPickable | IDFlag_IsHighlightable);
     node->setPosition(newPosition); // Put its feet on the floor.
@@ -12,6 +13,7 @@ Enemy::Enemy(vector3df newPosition,float newSpeed,int myhealth,bool transparent,
     material.setTexture(0, driver->getTexture("data/Archvile/archvile.png"));
     material.Lighting = true;
     material.NormalizeNormals = true;
+
 
     node->getMaterial(0) = material;
 
@@ -118,15 +120,21 @@ void Enemy::collision(ISceneManager* smgr, ITriangleSelector* selector) {
 void Enemy::healthDecrease()
 {
     health -= 1;
+    video::SMaterial material = node->getMaterial(0);
+    material.setTexture(0, driver->getTexture("data/Archvile/archres.png"));
+    node->setMD2Animation(scene::EMAT_PAIN_A);
+    node->setAnimationSpeed(20.f);
+    node->getMaterial(0)=material;
+
 }
 
 void Enemy::enemyHurt()
 {
-    video::SMaterial material=node->getMaterial(0);
+    video::SMaterial material = node->getMaterial(0);
     material.setTexture(0, driver->getTexture("data/Archvile/archvile.png"));
     node->setMD2Animation(scene::EMAT_STAND);
     node->setAnimationSpeed(20.f);
-    node->getMaterial(0)=material;
+    node->getMaterial(0) = material;
 
 }
 

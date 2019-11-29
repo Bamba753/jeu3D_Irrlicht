@@ -8,7 +8,7 @@ Player::Player(ISceneManager* mysmgr, IVideoDriver* mydriver, Camera* mycamera,S
                                           10,
                                           core::vector3df (35, -35, 75));
     node->setMaterialTexture(0, driver->getTexture("data/AK/AK_diffuse.jpg"));
-    node->setMaterialFlag(EMF_LIGHTING, false);
+    node->setMaterialFlag(EMF_LIGHTING, true);
     node->setScale(core::vector3df(0.4f));
     node->setMaterialType(video::EMT_TRANSPARENT_ALPHA_CHANNEL );
     node->setMaterialFlag(video::EMF_ZBUFFER, false);

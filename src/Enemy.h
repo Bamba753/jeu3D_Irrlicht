@@ -33,6 +33,7 @@ class Enemy
         float speed;
         int health;
         int wave;
+        IVideoDriver* driver;
 
 
 };
