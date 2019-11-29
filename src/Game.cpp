@@ -321,6 +321,7 @@ void Game::killEnemy(Player* player,GameEvent* receiver)
                                     player->targetGun()->remove();
                                     player->setHighLight(NULL);
                                     enemyList.erase(it);
+                                    enemy=NULL;
                                 }
                                 break;
                             }
