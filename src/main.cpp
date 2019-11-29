@@ -100,7 +100,7 @@ int main()
     u32 width;
     u32 heigth;
     bool begin = true;
-
+    bool recul=false;
     while(device->run())
     {
         if (!device->isWindowActive())
@@ -108,6 +108,8 @@ int main()
             device->yield();
             continue;
         }
+        //std::cout<<player->getNode()->getPosition().X<<player->getNode()->getPosition().Y<<player->getNode()->getPosition().Z<<std::endl;
+
 
         presentTime = device->getTimer()->getTime();
         deltaTime = presentTime - previousTime;
@@ -167,10 +169,22 @@ int main()
                               material,selector,
                               width,heigth);
 
+
                     if(receiver->getLeftButton() && (device->getTimer()->getTime() - lastShoot > 200))
                     {
                         engine->play2D(shootSound); // Music background
+
+                        player->getNode()->setPosition(player->getNode()->getPosition()+core::vector3df(0,0,-25));
+                        recul=true;
+
                         lastShoot = device->getTimer()->getTime();
+                    }
+                    if (recul && (device->getTimer()->getTime() - lastShoot > 50))
+                    {
+
+                        player->getNode()->setPosition(player->getNode()->getPosition()+core::vector3df(0,0,25));
+                        recul=false;
+
                     }
 
 
