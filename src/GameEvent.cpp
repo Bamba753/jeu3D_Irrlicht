@@ -19,7 +19,6 @@ bool GameEvent::OnEvent(const irr::SEvent& event)
                 break;
         }
 
-
         case EET_GUI_EVENT:
         {
             s32 id = event.GUIEvent.Caller->getID();

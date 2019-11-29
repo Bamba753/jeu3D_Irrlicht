@@ -23,6 +23,7 @@ class Player
             bool isDead();
             void healthDecrease(IrrlichtDevice* device);
             void setHighLight(scene::ISceneNode* value);
+            void setHealth(int value);
 
 
     private:

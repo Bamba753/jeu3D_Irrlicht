@@ -2,7 +2,9 @@
 #include "driverChoice.h"
 #include "GameEvent.h"
 #include "Enemy.h"
-
+#include <vector>
+#include <time.h>
+#include <cstdlib>
 
 using namespace irr;
 using namespace core;
@@ -32,6 +34,8 @@ class Game
         void displayRedScreen();
         void displayGameOverMenu();
         bool gameOver(Player* player);
+        bool gameComplete();
+        void displayGameCompleteMenu();
 
 
     private:
@@ -40,14 +44,16 @@ class Game
         IVideoDriver* driver;
         IGUIEnvironment* env;
         Camera* camera;
+        std::vector<vector3df> positionAvailable;
         list<Enemy*> enemyList;
         int NumberEnemy;
         ITexture *digits[11];
-        int time;
+        int tps;
         int fps;
         f32 last = 0.0f;
+        bool load_done;
+        int wave;
         Enemy* enemy_hurt;
         bool enemy_dammage=false;
         f32 last2 = 0.0f;
-
 };

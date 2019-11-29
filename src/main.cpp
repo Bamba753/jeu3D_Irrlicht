@@ -83,7 +83,6 @@ int main()
     Game* game = new Game(device,smgr,driver);                  // camera
     game->initInterface();                                      // Initialisation de l'interface
     Player* player = new Player(smgr,driver,camera,material);   // Chargement de l'arme
-    game->loadEnemy(camera,material,selector);                  // Chargement des ennemis
 
 
     device->getCursorControl()->setVisible(true);               //Curseur visible au debut du jeu
@@ -91,6 +90,7 @@ int main()
     material.Lighting = false;
 
     int lastFPS = -1;
+    material.Wireframe=false;
 
     f32 deltaTime = 0.0f;
     f32 presentTime = 0.0f;
@@ -100,8 +100,7 @@ int main()
     u32 width;
     u32 heigth;
     bool begin = true;
-    bool pause =false;
-
+    bool pause = false;
 
     while(device->run())
     {
@@ -130,15 +129,14 @@ int main()
                 {
                     std::cout<<"pause"<<std::endl;
                     game->pause(receiver->isKeyDown(KEY_ESCAPE) ,receiver);
-
-                    pause=true;
+                    pause = true;
                 }
                 else
                 {
-                    std::cout<<"UNpause"<<std::endl;
+                    std::cout<<"Unpause"<<std::endl;
 
                     game->unpause(receiver->isKeyDown(KEY_ESCAPE) ,receiver,player);
-                    pause=false;
+                    pause = false;
                 }
                 lastTime = presentTime;
             }
@@ -152,7 +150,7 @@ int main()
             if((deltaTime > 15) && (!receiver->Context.pause))
             {
                 previousTime = presentTime;
-                if(receiver->Context.launch && !game->gameOver(player))
+                if(receiver->Context.launch && !game->gameOver(player) && !game->gameComplete())
                 {
                     // Arrete la musique au debut du jeu
                     if(engine)
@@ -196,6 +194,11 @@ int main()
                     device->getCursorControl()->setVisible(true);
                     game->displayGameOverMenu();
                 }
+                else if(game->gameComplete())
+                {
+                    device->getCursorControl()->setVisible(true);
+                    game->displayGameCompleteMenu();
+                }
                 else
                 {
                     env->drawAll();
@@ -207,7 +210,7 @@ int main()
 
 
     }
-
+    engine->drop();
     device->drop();
 
     return 0;
