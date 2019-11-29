@@ -1,6 +1,6 @@
 #include "Enemy.h"
 
-Enemy::Enemy(vector3df newPosition,float newSpeed,ISceneManager* smgr,Camera* playerTarget ,video::SMaterial material,IVideoDriver* driver)
+Enemy::Enemy(vector3df newPosition,float newSpeed,int myhealth,bool transparent,ISceneManager* smgr,Camera* playerTarget ,video::SMaterial material,IVideoDriver* driver)
 {
     // Add an MD2 node, which uses vertex-based animation.
     node = smgr->addAnimatedMeshSceneNode(smgr->getMesh("data/Archvile/Archvile.md2"),
@@ -16,11 +16,16 @@ Enemy::Enemy(vector3df newPosition,float newSpeed,ISceneManager* smgr,Camera* pl
     node->getMaterial(0) = material;
 
     node->setDebugDataVisible(irr::scene::EDS_BBOX);
-   // node->setDebugDataVisible(irr::scene::EDS_HALF_TRANSPARENCY); // Idee deuxieme vage
+
+    if(transparent)
+    {
+         node->setDebugDataVisible(irr::scene::EDS_HALF_TRANSPARENCY); // Idee deuxieme vage
+    }
+
     target = playerTarget;
     speed  = newSpeed;
 
-    health = 5;
+    health = myhealth;
 }
 
 
@@ -113,6 +118,16 @@ void Enemy::collision(ISceneManager* smgr, ITriangleSelector* selector) {
 void Enemy::healthDecrease()
 {
     health -= 1;
+}
+
+void Enemy::enemyHurt()
+{
+    video::SMaterial material=node->getMaterial(0);
+    material.setTexture(0, driver->getTexture("data/Archvile/archvile.png"));
+    node->setMD2Animation(scene::EMAT_STAND);
+    node->setAnimationSpeed(20.f);
+    node->getMaterial(0)=material;
+
 }
 
 int Enemy::getHealth()

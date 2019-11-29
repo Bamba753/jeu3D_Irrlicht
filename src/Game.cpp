@@ -7,7 +7,24 @@ Game::Game(IrrlichtDevice* irrDevice, ISceneManager* manager, IVideoDriver* vide
         driver = videoDriver;
         env = device->getGUIEnvironment();
 
+        positionAvailable.push_back(vector3df(  414.0, 153.0, 1351.25));   //position 1
+        positionAvailable.push_back(vector3df(  124.0, 117.0, 1292.0));    //position 2
+        positionAvailable.push_back(vector3df(  549.0, 149.0,  884.0));    //position 3
+        positionAvailable.push_back(vector3df( -688.0, 149.0,  884.0));    //position 4
+        positionAvailable.push_back(vector3df(  414.0, 624.0,  310.0));    //position 5
+        positionAvailable.push_back(vector3df(   81.2, 149.0, -474.0));    //position 6
+        positionAvailable.push_back(vector3df(  789.0, 149.0, -469.0));    //position 7
+        positionAvailable.push_back(vector3df( 1450.3, 421.0,   72.8154)); //position 8
+        positionAvailable.push_back(vector3df( 1257.2, 129.0,  279.908));  //position 9
+        positionAvailable.push_back(vector3df( 1286.8, 149.02, 923.685));  //position 10
+        positionAvailable.push_back(vector3df(  469.1,  85.02,1810.16));   //position 11
+        positionAvailable.push_back(vector3df(  384.0,  81.02, 385.385));  //position 12
+        positionAvailable.push_back(vector3df(   30.2,  80.0, 800.0));    //position 13
+        positionAvailable.push_back(vector3df(  893.6,  87.0,  382.5));    //position 14
+        positionAvailable.push_back(vector3df( 1738.1, 149.0,  353.3));    //position 15
 
+        wave = 0;
+        load_done = true;
         digits[0] = driver->getTexture("data/0.png");
         digits[1] = driver->getTexture("data/1.png");
         digits[2] = driver->getTexture("data/2.png");
@@ -40,20 +57,27 @@ void Game::initInterface()
     env->addButton(rect<s32>(345, 400, 590, 440), 0, GUI_ID_QUIT_BUTTON,
             L"Quiter le jeu", L"Ah noooon. Tu veux quitter le jeu?");
 
-    time = 600;
-    fps = 0;
+    tps = 600;
+    fps  = 0;
+    wave = 0;
+    srand(time(0)); // initialisation du rand
 }
 
 void Game::jeu(Player* player,Camera* camera,GameEvent* receiver,SMaterial material,ITriangleSelector* selector,u32 w,u32 h)
 {
+    if ((enemyList.getSize() <= 0) && (load_done) )
+    {
+        load_done = false;
+        wave += 1;
+    }
 
-     displayHealthBar(player);
-     displayTime();
-     runEnemy();
-     collisionBetweenEnemy();
-     collisionPlayerAllEnemy(camera,player);
-     killEnemy(player,receiver);
-
+    loadEnemy(camera,material,selector);
+    displayHealthBar(player);
+    displayTime();
+    runEnemy();
+    collisionBetweenEnemy();
+    collisionPlayerAllEnemy(camera,player);
+    killEnemy(player,receiver);
 
 }
 
@@ -63,8 +87,6 @@ void Game::pause(bool isPaused,GameEvent* receiver)
     if(isPaused)
     {
         receiver->Context.pause = true;
-
-
 
     }
 
@@ -97,12 +119,64 @@ void Game::displayHealthBar(Player* player)
 
 void Game::loadEnemy(Camera* camera,SMaterial material,ITriangleSelector* selector)
 {
-
-    for(int i;i<5;i++)
+    switch(wave)
     {
-        Enemy* enemy = new Enemy(core::vector3df(i*10+0.231,0.0,i*207.0),1,smgr,camera,material,driver);
-        enemy->collision(smgr,selector);
-        enemyList.push_back(enemy);
+        case 1:
+            if(!load_done)
+            {
+                for(int i;i<5;i++)
+                {
+                    int index = rand()%15;
+                    Enemy* enemy = new Enemy(positionAvailable.at(index),1,5,false,smgr,camera,material,driver);
+                    enemy->collision(smgr,selector);
+                    enemyList.push_back(enemy);
+                }
+              load_done = true;
+            }
+            break;
+        case 2:
+            if(!load_done)
+            {
+                for(int i;i<7;i++)
+                {
+                    int index = rand()%15;
+                    Enemy* enemy = new Enemy(positionAvailable.at(index),1,5,false,smgr,camera,material,driver);
+                    enemy->collision(smgr,selector);
+                    enemyList.push_back(enemy);
+                }
+                load_done = true;
+            }
+            break;
+        case 3:
+            if(!load_done)
+            {
+                for(int i;i<10;i++)
+                {
+                    int index = rand()%15;
+                    Enemy* enemy = new Enemy(positionAvailable.at(index),1,5,false,smgr,camera,material,driver);
+                    enemy->collision(smgr,selector);
+                    enemyList.push_back(enemy);
+                }
+                load_done = true;
+            }
+            break;
+        case 4:
+            if(!load_done)
+            {
+                std::cout<<" Vague Finale "<<std::endl;
+                for(int i;i<12;i++)
+                {
+                    int index = rand()%15;
+                    Enemy* enemy = new Enemy(positionAvailable.at(index),1,5,true,smgr,camera,material,driver);
+                    enemy->collision(smgr,selector);
+                    enemyList.push_back(enemy);
+                }
+                load_done = true;
+            }
+            break;
+
+        default:
+            break;
     }
 }
 
@@ -163,7 +237,7 @@ void Game::displayTime()
 
     if(fps > driver->getFPS())
     {
-        time -= 1;
+        tps -= 1;
         fps = 0;
     }
     env->clear();
@@ -184,12 +258,12 @@ void Game::displayTime()
     secondes_u->setScaleImage(true);
 
 
-    minutes_d->setImage(digits[(time / 60) /10]);
-    minutes_u->setImage(digits[(time / 60) % 10]);
+    minutes_d->setImage(digits[(tps / 60) /10]);
+    minutes_u->setImage(digits[(tps / 60) % 10]);
     point_inf->setImage(digits[10]);
     point_sup->setImage(digits[10]);
-    secondes_d->setImage(digits[(time % 60)/10]);
-    secondes_u->setImage(digits[(time % 60) % 10]);
+    secondes_d->setImage(digits[(tps % 60)/10]);
+    secondes_u->setImage(digits[(tps % 60) % 10]);
 
     env->drawAll();
 }
@@ -226,7 +300,6 @@ void Game::killEnemy(Player* player,GameEvent* receiver)
 
                                 Enemy* enemy = dynamic_cast<Enemy*>(ptr_bis);
                                 enemy->healthDecrease();
-                                std::cout<<enemy->getHealth()<<std::endl;
                                 if(enemy->getHealth() <= 0 )
                                 {
                                     player->targetGun()->remove();
@@ -422,9 +495,28 @@ void Game::displayGameOverMenu()
 
 }
 
+void Game::displayGameCompleteMenu()
+{
+
+    env->addImage(device->getVideoDriver()->getTexture("data/interface.png"), vector2d<s32>(0, 0), false);
+    env->addButton(rect<s32>(50, 50, 200, 90), 0, GUI_ID_PLAY_CONTINUE_BUTTON,
+            L"Rejouer", L"T'es chaud. Vas y !!!");
+    env->addButton(rect<s32>(50,230, 200, 270), 0, GUI_ID_QUIT_BUTTON,
+            L"Quiter le jeu", L"Ah noooon. Tu veux quitter le jeu?");
+    env->drawAll();
+
+}
+
 bool Game::gameOver(Player* player)
 {
     if (player->isDead())
+        return true;
+    false;
+}
+
+bool Game::gameComplete()
+{
+    if ((wave > 4) && (enemyList.getSize() <= 0))
         return true;
     false;
 }

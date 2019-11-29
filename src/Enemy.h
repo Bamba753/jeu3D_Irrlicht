@@ -11,7 +11,7 @@ class Enemy
 {
 
     public:
-        Enemy(vector3df newPosition,float newSpeed,ISceneManager* smgr,Camera* playerTarget,video::SMaterial material, IVideoDriver* driver);
+        Enemy(vector3df newPosition,float newSpeed,int myhealth,bool transparent,ISceneManager* smgr,Camera* playerTarget,video::SMaterial material, IVideoDriver* driver);
         IAnimatedMeshSceneNode* getNode();
         virtual vector3df getPosition();
         vector3df getDirection(vector3df v, vector3df r);
@@ -21,6 +21,7 @@ class Enemy
         void attack();
         void healthDecrease();
         int getHealth();
+        void enemyHurt();
 
 
     private:
@@ -31,6 +32,7 @@ class Enemy
         video::SMaterial material;
         float speed;
         int health;
+        int wave;
 
 
 };

@@ -77,6 +77,7 @@ bool GameEvent::OnEvent(const irr::SEvent& event)
                         env->clear();
                         Context.launch = true;
                         Context.pause = false;
+                        break;
 
                     default:
                         return false;

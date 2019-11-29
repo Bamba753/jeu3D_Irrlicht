@@ -39,6 +39,10 @@ int Player::getHealth(){
     return health;
 }
 
+void Player::setHealth(int value){
+    health = value;
+}
+
 void Player::healthDecrease(IrrlichtDevice* device)
 {
     if(device->getTimer()->getTime() - lasttouch >200)
