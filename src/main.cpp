@@ -57,6 +57,7 @@ int main()
     device->setEventReceiver(receiver);
     receiver->Context.launch = false;
     receiver->Context.pause = false;
+    receiver->Context.restart = false;
 
     ///////////////////////////////////////////////////////////////////////////
     /// Scene
@@ -157,16 +158,10 @@ int main()
                 previousTime = presentTime;
                 if(receiver->Context.launch && !game->gameOver(player) && !game->gameComplete())
                 {
-                    // Arrete la musique au debut du jeu
-                    if(engine)
-                    {
-                        //engine->drop();
-                        //engine = createIrrKlangDevice();
-                    }
-
 
                     device->getCursorControl()->setVisible(false);
                     begin =  false;
+
                     smgr->drawAll();
                     player->targetGun();
                     game->jeu(player,camera,receiver,
@@ -177,10 +172,10 @@ int main()
                     {
                         engine->play2D(shootSound); // Music background
                         player->setRecul(recul);
-                       recul=true;
-
+                        recul=true;
                         lastShoot = device->getTimer()->getTime();
                     }
+
                     if (recul && (device->getTimer()->getTime() - lastShoot > 50))
                     {
 
@@ -188,8 +183,6 @@ int main()
                         recul=false;
 
                     }
-
-
 
                     int fps = driver->getFPS();
 
