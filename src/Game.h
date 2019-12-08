@@ -2,7 +2,6 @@
 #include "driverChoice.h"
 #include "GameEvent.h"
 #include "Enemy.h"
-#include <vector>
 #include <time.h>
 #include <cstdlib>
 
@@ -36,6 +35,7 @@ class Game
         bool gameOver(Player* player);
         bool gameComplete();
         void displayGameCompleteMenu();
+        void clearListEnemy();
 
 
     private:
@@ -56,4 +56,5 @@ class Game
         Enemy* enemy_hurt;
         bool enemy_dammage=false;
         f32 last2 = 0.0f;
+
 };

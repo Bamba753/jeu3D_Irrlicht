@@ -74,17 +74,22 @@ bool GameEvent::OnEvent(const irr::SEvent& event)
                         env->addButton(rect<s32>(345, 400, 590, 440), 0, GUI_ID_QUIT_BUTTON,
                                 L"Quiter le jeu", L"Ah noooon. Tu veux quitter le jeu?");
                         break;
+
                     case GUI_ID_PLAY_CONTINUE_BUTTON:
                         env->clear();
                         Context.launch = true;
                         Context.pause = false;
 
+                    case GUI_ID_RESTART_BUTTON:
+                        env->clear();
+                        Context.launch = true;
+                        Context.pause = false;
+                        Context.restart = true;
+
                     default:
                         return false;
                     }
                 break;
-
-
             }
         }
 
@@ -101,7 +106,6 @@ bool GameEvent::OnEvent(const irr::SEvent& event)
                     break;
 
                 default:
-                    // We won't use the wheel
                     break;
             }
         }

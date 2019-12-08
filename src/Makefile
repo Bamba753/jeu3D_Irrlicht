@@ -1,6 +1,6 @@
-CPPFLAGS = -I/usr/include/irrlicht -I"../include" -L"/usr/lib" ../bin/linux-gcc-64/libIrrKlang.so -pthread
+CPPFLAGS = -I/usr/include/irrlicht -I"../include" 
 CXXFLAGS = -Wall -Wextra -O2 -g -std=c++11 -Wno-unused
-OPT= -I"../include" -L"/usr/lib" ../bin/linux-gcc-64/libIrrKlang.so -pthread 
+OPT= -L"/usr/lib" ../bin/linux-gcc-64/libIrrKlang.so -pthread 
 
 irrlicht: main.o GameEvent.o Camera.o Player.o Game.o Enemy.o
 	g++ $^ -o $@ -lIrrlicht $(OPT)

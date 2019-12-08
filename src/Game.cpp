@@ -9,7 +9,7 @@ Game::Game(IrrlichtDevice* irrDevice, ISceneManager* manager, IVideoDriver* vide
 
         positionAvailable.push_back(vector3df(  414.0, 153.0, 1351.25));   //position 1
         positionAvailable.push_back(vector3df(  124.0, 117.0, 1292.0));    //position 2
-        positionAvailable.push_back(vector3df(  549.0, 149.0,  884.0));    //position 3
+        positionAvailable.push_back(vector3df(  400.0, 149.0,  700.0));    //position 3
         positionAvailable.push_back(vector3df( -688.0, 149.0,  884.0));    //position 4
         positionAvailable.push_back(vector3df(  414.0, 624.0,  310.0));    //position 5
         positionAvailable.push_back(vector3df(   81.2, 149.0, -474.0));    //position 6
@@ -68,9 +68,27 @@ void Game::jeu(Player* player,Camera* camera,GameEvent* receiver,SMaterial mater
     if ((enemyList.getSize() <= 0) && (load_done) )
     {
         load_done = false;
-        wave += 1;
+        wave = 4;
     }
 
+    if(receiver->Context.restart)
+    {
+        wave = 0;
+        load_done = true;
+        tps = 600;
+        fps  = 0;
+        wave = 0;
+        srand(time(0)); // initialisation du rand
+        if(enemyList.getSize() <= 0)
+        {
+             receiver->Context.restart = false;
+        }
+        camera->getNode()->setPosition(core::vector3df(0.0,1000.0,0.0));
+        clearListEnemy();
+
+    }
+    else
+    {
     loadEnemy(camera,material,selector);
     displayHealthBar(player);
     displayTime();
@@ -78,6 +96,7 @@ void Game::jeu(Player* player,Camera* camera,GameEvent* receiver,SMaterial mater
     collisionBetweenEnemy();
     collisionPlayerAllEnemy(camera,player);
     killEnemy(player,receiver);
+    }
 
 }
 
@@ -119,28 +138,29 @@ void Game::displayHealthBar(Player* player)
 
 void Game::loadEnemy(Camera* camera,SMaterial material,ITriangleSelector* selector)
 {
+    int index = rand()%4;
     switch(wave)
     {
         case 1:
             if(!load_done)
             {
-                for(int i;i<5;i++)
+                int i = 0;
+                for(i;i<5;i++)
                 {
-                    int index = rand()%15;
-                    Enemy* enemy = new Enemy(positionAvailable.at(index),1,5,false,smgr,camera,material,driver);
+
+                    Enemy* enemy = new Enemy(positionAvailable.at(index+i),1,5,false,smgr,camera,material,driver);
                     enemy->collision(smgr,selector);
                     enemyList.push_back(enemy);
                 }
-              load_done = true;
+                load_done = true;
             }
             break;
         case 2:
             if(!load_done)
             {
-                for(int i;i<7;i++)
+                for(int i=0;i<7;i++)
                 {
-                    int index = rand()%15;
-                    Enemy* enemy = new Enemy(positionAvailable.at(index),1,5,false,smgr,camera,material,driver);
+                    Enemy* enemy = new Enemy(positionAvailable.at(index+i),1,5,false,smgr,camera,material,driver);
                     enemy->collision(smgr,selector);
                     enemyList.push_back(enemy);
                 }
@@ -150,10 +170,9 @@ void Game::loadEnemy(Camera* camera,SMaterial material,ITriangleSelector* select
         case 3:
             if(!load_done)
             {
-                for(int i;i<10;i++)
+                for(int i=0;i<10;i++)
                 {
-                    int index = rand()%15;
-                    Enemy* enemy = new Enemy(positionAvailable.at(index),1,5,false,smgr,camera,material,driver);
+                    Enemy* enemy = new Enemy(positionAvailable.at(index+i),1,5,false,smgr,camera,material,driver);
                     enemy->collision(smgr,selector);
                     enemyList.push_back(enemy);
                 }
@@ -164,10 +183,9 @@ void Game::loadEnemy(Camera* camera,SMaterial material,ITriangleSelector* select
             if(!load_done)
             {
                 std::cout<<" Vague Finale "<<std::endl;
-                for(int i;i<12;i++)
+                for(int i=0;i<12;i++)
                 {
-                    int index = rand()%15;
-                    Enemy* enemy = new Enemy(positionAvailable.at(index),1,5,true,smgr,camera,material,driver);
+                    Enemy* enemy = new Enemy(positionAvailable.at(index+i),1,5,true,smgr,camera,material,driver);
                     enemy->collision(smgr,selector);
                     enemyList.push_back(enemy);
                 }
@@ -180,6 +198,7 @@ void Game::loadEnemy(Camera* camera,SMaterial material,ITriangleSelector* select
     }
 }
 
+
 void Game::runEnemy()
 {
     Enemy* ptr = NULL;
@@ -190,7 +209,7 @@ void Game::runEnemy()
     if(enemyList.getSize() != 0)
     {
         //  parcourir la liste des enemy
-        for (int i = 0; i <enemyList.getSize() ; ++i)
+        for (unsigned int i = 0; i <enemyList.getSize() ; ++i)
         {
                 // Check for it.current = NULL.
                 if (it.operator==(tempIterator))
@@ -279,8 +298,6 @@ void Game::killEnemy(Player* player,GameEvent* receiver)
         last2=device->getTimer()->getTime();
         enemy_hurt=NULL;
 
-
-
     }
 
     if ((player->targetGun() && player->targetGun()->getID()!=-1))
@@ -296,7 +313,7 @@ void Game::killEnemy(Player* player,GameEvent* receiver)
             if(enemyList.getSize() != 0)
             {
                     //  parcourir la liste des
-                    for (int i = 0; i <enemyList.getSize() ; ++i)
+                    for (unsigned int i = 0; i <enemyList.getSize() ; ++i)
                     {
                             // Check for it.current = NULL.
                             if (it.operator==(tempIterator))
@@ -348,7 +365,7 @@ void Game::collisionBetweenEnemy()
     if(enemyList.getSize() != 0)
     {
         //  parcourir la liste des enemy
-        for (int i = 0; i <enemyList.getSize() ; ++i)
+        for (unsigned int i = 0; i <enemyList.getSize() ; ++i)
         {
                 // Check for it.current = NULL.
                 if (it.operator==(tempIterator))
@@ -387,7 +404,7 @@ void Game::collisionEnemy(Enemy* enemy1)
      if(enemyList.getSize() != 0)
      {
          //  parcourir la liste des enemy
-         for (int i = 0; i <enemyList.getSize() ; ++i)
+         for (unsigned int i = 0; i <enemyList.getSize() ; ++i)
          {
                  // Check for it.current = NULL.
                  if (it.operator==(tempIterator))
@@ -440,7 +457,7 @@ void Game::collisionPlayerAllEnemy(Camera* camera,Player* player)
     if(enemyList.getSize() != 0)
     {
         //  parcourir la liste des enemy
-        for (int i = 0; i <enemyList.getSize() ; ++i)
+        for (unsigned int i = 0; i <enemyList.getSize() ; ++i)
         {
                 // Check for it.current = NULL.
                 if (it.operator==(tempIterator))
@@ -515,7 +532,7 @@ void Game::displayGameCompleteMenu()
 {
 
     env->addImage(device->getVideoDriver()->getTexture("data/interface.png"), vector2d<s32>(0, 0), false);
-    env->addButton(rect<s32>(50, 50, 200, 90), 0, GUI_ID_PLAY_CONTINUE_BUTTON,
+    env->addButton(rect<s32>(50, 50, 200, 90), 0, GUI_ID_RESTART_BUTTON,
             L"Rejouer", L"T'es chaud. Vas y !!!");
     env->addButton(rect<s32>(50,230, 200, 270), 0, GUI_ID_QUIT_BUTTON,
             L"Quiter le jeu", L"Ah noooon. Tu veux quitter le jeu?");
@@ -525,14 +542,56 @@ void Game::displayGameCompleteMenu()
 
 bool Game::gameOver(Player* player)
 {
-    if (player->isDead())
+    if (player->isDead() ||(tps <0))
         return true;
-    false;
+    return false;
 }
 
 bool Game::gameComplete()
 {
     if ((wave > 4) && (enemyList.getSize() <= 0))
         return true;
-    false;
+    return false;
 }
+
+void Game::clearListEnemy()
+{
+    scene::ISceneNode* ptr = NULL;
+    list<Enemy*>::Iterator it = list<Enemy*>::Iterator();
+    list<Enemy*>::Iterator tempIterator = list<Enemy*>::Iterator();
+    it = enemyList.begin();
+
+    if(enemyList.getSize() != 0)
+    {
+        //  parcourir la liste des enemy
+        for (unsigned int i = 0; i <enemyList.getSize() ; ++i)
+        {
+                // Check for it.current = NULL.
+                if (it.operator==(tempIterator))
+                {
+                        return;
+                }
+
+                // Check for Enemy.
+                ptr = dynamic_cast<Enemy*>(it.operator*())->getNode();
+                if (ptr != NULL)
+                {
+
+                       ptr->remove();
+                       enemyList.erase(it);
+                       break;
+
+                }
+
+
+                // Check for it.current->next = NULL.
+                if (tempIterator.operator==(it.operator++()))
+                {
+                        return;
+                }
+        }
+
+    }
+}
+
+

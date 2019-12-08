@@ -14,7 +14,7 @@ struct SAppContext
     irr::IrrlichtDevice *device;
     bool            launch ;
     bool            pause ;
-
+    bool            restart;
 };
 
 enum
@@ -25,7 +25,8 @@ enum
     GUI_ID_INSTRUCTIONS_BUTTON,
     GUI_ID_INSTRUCTIONS_BACK_BUTTON,
     GUI_ID_CONTROLS_BACK_BUTTON,
-    GUI_ID_PLAY_CONTINUE_BUTTON
+    GUI_ID_PLAY_CONTINUE_BUTTON,
+    GUI_ID_RESTART_BUTTON
 };
 
 

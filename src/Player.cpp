@@ -32,6 +32,8 @@ Player::Player(ISceneManager* mysmgr, IVideoDriver* mydriver, Camera* mycamera,S
     // Remember which scene node is highlighted
      highlightedSceneNode = 0;
      collMan = smgr->getSceneCollisionManager();
+     
+
 
 }
 
@@ -132,5 +134,14 @@ scene::ISceneNode* Player::targetGun()
     return(highlightedSceneNode);
 }
 
+void Player::setRecul(bool recul)
+{
+    if (!recul)
+         node->setPosition(node->getPosition()+core::vector3df(0,0,-25));
+    else
+         node->setPosition(node->getPosition()+core::vector3df(0,0,25));
+
+
+}
 
 

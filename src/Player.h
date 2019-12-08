@@ -1,7 +1,7 @@
 #include <irrlicht.h>
 #include "Camera.h"
 #include <iostream>
-
+#include <vector>
 using namespace irr;
 using namespace core;
 using namespace scene;
@@ -24,6 +24,7 @@ class Player
             void healthDecrease(IrrlichtDevice* device);
             void setHighLight(scene::ISceneNode* value);
             void setHealth(int value);
+            void setRecul(bool recul);
 
 
     private:
@@ -39,5 +40,6 @@ class Player
             ISceneNode* highlightedSceneNode;
             ISceneCollisionManager* collMan;
             f32 lasttouch = 0.0f;
+            std::vector<int> indexPos;
 
 };
